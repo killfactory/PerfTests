@@ -11,19 +11,6 @@ function getRandomizedSpanCell() {
     return isBlack ? '<span class="black"></span>' : '<span></span>';
 }
 
-function getRandomizedTable(width, height) {
-    return getEnclosedHtml(height, (x, i) => getRandomizedRow(width), '<table class="grid">', '</table>');
-}
-
-function getRandomizedRow(width) {
-    return getEnclosedHtml(width, (x, i) => getRandomizedCell(), '<tr>', '</tr>');
-}
-
-function getRandomizedCell() {
-    let isBlack = Math.random() >= 0.5;
-    return isBlack ? '<td class="black" />' : '<td />';
-}
-
 function getEnclosedHtml(len, func, openTag, closeTag) {
     let array = Array.from({length: len + 2}).map((x, i) => i == 0 
                                                               ? openTag 
@@ -33,31 +20,90 @@ function getEnclosedHtml(len, func, openTag, closeTag) {
     return array.join('');
 }
 
-function renderSomething(target, func, name, nextFunc){
-    let start = new Date()
+function getMeasure() {
+    return {
+        now: new Date(),
+        lap: function () {
+            let currentTime = new Date();
+            let difference = currentTime - this.now;
+            this.now = currentTime;
+            return difference;
+        }
+    }
+}
+
+function renderSomething(target, func, name, nextFunc, cleanFunc, assignFunc){
+    let measure = getMeasure();
     let something = func();
-    let endCalc = new Date()
-    console.log("calculating " + name + ": " + (endCalc - start) + ", length: " + something.length);
-    target.innerHTML = something;
-    let endSet = new Date();
-    console.log("set " + name + ": " + (endSet - endCalc));
+    console.log("===== calculating " + name + ": " + measure.lap() + (something.length ? ", length: " + something.length : ''));
+    cleanFunc(target);
+    console.log("clean " + name + ": " + measure.lap());
     setTimeout(() => {
-        let endRender = new Date();
-        console.log("render " + name + ": " + (endRender - endSet));
-        setTimeout(nextFunc, 0);
+        console.log("render (cleaned) " + name + ": " + measure.lap());
+        assignFunc(target, something);
+        console.log("set " + name + ": " + measure.lap());
+        setTimeout(() => {
+            console.log("render (set) " + name + ": " + measure.lap());
+            if (nextFunc) {
+                setTimeout(nextFunc, 0);
+            }
+        }, 0);
     }, 0);
+}
+
+function renderSomethingAsString(target, func, name, nextFunc) {
+    renderSomething(target, func, name + " (string)", nextFunc, (t) => t.innerHTML = '', (t, s) => t.innerHTML = s)
+}
+
+function renderSomethingAsElement(target, func, name, nextFunc) {
+    renderSomething(target, func, name + " (element)", nextFunc, (t, e) => {
+        let firstChild = t.firstChild;
+        if (firstChild){ 
+            t.removeChild(t.firstChild);
+        }
+    }, (t, e) => {
+        t.appendChild(e);
+    });
 }
 
 let renderPoint = document.getElementById('renderpoint');
 let renderPoint2 = document.getElementById('renderpoint2');
-renderSomething(renderPoint2, () => 'Loading......', 'reflow time for empty page', () => {
-    renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid', () => {
-        renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid2 - replace', () => {
-            renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid3 - another replace', () => {
-                //renderSomething(renderPoint, () => getRandomizedTable(400, 250), 'table')
-                // this should show the reflow time
-                renderSomething(renderPoint, () => '', 'reflow time')
+renderSomethingAsString(renderPoint2, () => 'Loading......', 'reflow time for empty page', () => {
+    renderSomethingAsString(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid', () => {
+        renderSomethingAsElement(renderPoint2, () => getRandomizedDivGridElement(400, 250), 'divGrid2 - replace', () => {
+            renderSomethingAsString(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid3 - replace', () => {
+                renderSomethingAsElement(renderPoint2, () => getRandomizedDivGridElement(400, 250), 'divGrid4 - replace', () => {
+                    // this should show the reflow time
+                    renderSomethingAsString(renderPoint, () => '', 'reflow time')
+                });
             });
         });
     });
 });
+
+function getRandomizedDivGridElement(width, height) {
+    let divGrid = document.createElement('div');
+    divGrid.className = 'grid';
+    divGrid.app
+    appendChildren(height, () => divGrid.appendChild(getRandomizedDivRowElement(width)));
+    return divGrid;
+}
+
+function getRandomizedDivRowElement(width) {
+    let divRow = document.createElement('div');
+    appendChildren(width, () => divRow.appendChild(getRandomizedSpanCellElement()));
+    return divRow;
+}
+
+function getRandomizedSpanCellElement() {
+    let spanCell = document.createElement('span');
+    let isBlack = Math.random() >= 0.5;
+    if (isBlack) {
+        spanCell.className = 'black';
+    }
+    return spanCell;
+}
+
+function appendChildren(len, func) {
+    Array.from({length: len}).map(func);
+}
