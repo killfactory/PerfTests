@@ -1,0 +1,36 @@
+table.grid {
+    border-spacing: 0px;
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+}
+
+table.grid td {
+    width: 2px;
+    height: 2px;
+    padding: 0px;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+table.grid td.black, div.grid span.black {
+    background: black;
+}
+
+div.grid {
+    width: 1200px;
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+}
+
+div.grid div {
+    height: 3px;
+}
+
+div.grid span {
+    width: 2px;
+    height: 2px;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    display: inline-block;
+    vertical-align: top;
+}
