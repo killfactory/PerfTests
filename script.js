@@ -49,17 +49,17 @@ function renderSomething(target, func, name){
 
 let renderPoint = document.getElementById('renderpoint');
 let renderPoint2 = document.getElementById('renderpoint2');
-renderSomething(renderPoint2, () => 'Loading......', 'reflow cost for empty page')
+renderSomething(renderPoint2, () => 'Loading......', 'reflow time for empty page')
 setTimeout(() => {
     renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid')
     setTimeout(() => {
-        renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid2')
+        renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid2 - replace')
         setTimeout(() => {
-            renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid3')
+            renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid3 - another replace')
             setTimeout(() => {
                 //renderSomething(renderPoint, () => getRandomizedTable(400, 250), 'table')
-                // this should show the reflow cost
-                renderSomething(renderPoint, () => '', 'reflow cost')
+                // this should show the reflow time
+                renderSomething(renderPoint, () => '', 'reflow time')
             }, 0);
         }, 0);
     }, 0);
