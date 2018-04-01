@@ -33,7 +33,7 @@ function getEnclosedHtml(len, func, openTag, closeTag) {
     return array.join('');
 }
 
-function renderSomething(target, func, name){
+function renderSomething(target, func, name, nextFunc){
     let start = new Date()
     let something = func();
     let endCalc = new Date()
@@ -42,8 +42,9 @@ function renderSomething(target, func, name){
     let endSet = new Date();
     console.log("set " + name + ": " + (endSet - endCalc));
     setTimeout(() => {
-    let endRender = new Date();
-    console.log("render " + name + ": " + (endRender - endSet));
+        let endRender = new Date();
+        console.log("render " + name + ": " + (endRender - endSet));
+        setTimeout(nextFunc, 0);
     }, 0);
 }
 
