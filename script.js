@@ -37,7 +37,7 @@ function renderSomething(target, func, name, nextFunc){
     let start = new Date()
     let something = func();
     let endCalc = new Date()
-    console.log("calculating " + name + ": " + (endCalc - start));
+    console.log("calculating " + name + ": " + (endCalc - start) + ", length: " + something.length);
     target.innerHTML = something;
     let endSet = new Date();
     console.log("set " + name + ": " + (endSet - endCalc));
@@ -50,18 +50,14 @@ function renderSomething(target, func, name, nextFunc){
 
 let renderPoint = document.getElementById('renderpoint');
 let renderPoint2 = document.getElementById('renderpoint2');
-renderSomething(renderPoint2, () => 'Loading......', 'reflow time for empty page')
-setTimeout(() => {
-    renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid')
-    setTimeout(() => {
-        renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid2 - replace')
-        setTimeout(() => {
-            renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid3 - another replace')
-            setTimeout(() => {
+renderSomething(renderPoint2, () => 'Loading......', 'reflow time for empty page', () => {
+    renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid', () => {
+        renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid2 - replace', () => {
+            renderSomething(renderPoint2, () => getRandomizedDivGrid(400, 250), 'divGrid3 - another replace', () => {
                 //renderSomething(renderPoint, () => getRandomizedTable(400, 250), 'table')
                 // this should show the reflow time
                 renderSomething(renderPoint, () => '', 'reflow time')
-            }, 0);
-        }, 0);
-    }, 0);
-}, 0);
+            });
+        });
+    });
+});
